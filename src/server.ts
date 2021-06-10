@@ -38,6 +38,7 @@ export class Server {
 
     this.app.use(cors());
     this.app.use(WebSocketExpress.json());
+    this.app.use(router);
   }
 
   listen(port: number) {
