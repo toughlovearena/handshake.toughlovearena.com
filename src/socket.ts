@@ -51,7 +51,7 @@ export class SocketContainer {
       throw new Error('signal already registered');
     }
     this.signalId = data.message;
-    this.registry.get(this.signalId).register(this.socketId, data => this.socket.send(data));
+    this.registry.get(this.signalId).register(this.socketId, cbdata => this.socket.send(cbdata));
     this.processPending();
   }
   private processPending() {

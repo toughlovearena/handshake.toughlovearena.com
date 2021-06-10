@@ -1,8 +1,6 @@
 import { HandshakeData } from "./socket";
 
-interface SignalCallback {
-  (data: HandshakeData): void;
-}
+type SignalCallback = (data: HandshakeData) => void;
 
 export class Room {
   private readonly signalId: string;
