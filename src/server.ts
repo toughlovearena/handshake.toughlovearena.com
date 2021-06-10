@@ -2,7 +2,6 @@ import cors from 'cors';
 import WebSocketExpress, { Router } from 'websocket-express';
 import { SocketManager } from './manager';
 import { Registry } from './registry';
-import { SocketContainer } from './socket';
 
 export class Server {
   private app = new WebSocketExpress();
@@ -10,8 +9,8 @@ export class Server {
   constructor(gitHash: string) {
     const router = new Router();
     const started = new Date();
-    const manager = new SocketManager();
     const registry = new Registry();
+    const manager = new SocketManager(registry);
 
     router.get('/', (req, res) => {
       res.redirect('/health');
@@ -29,11 +28,7 @@ export class Server {
     // ws
     router.ws('/connect', async (req, res) => {
       const ws = await res.accept();
-      const sc = new SocketContainer({
-        socket: ws,
-        registry,
-      });
-      manager.push(sc);
+      manager.create(ws);
     });
 
     this.app.use(cors());
