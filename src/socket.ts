@@ -42,8 +42,12 @@ export class SocketContainer {
       this.pending.push(msg);
       return;
     }
-    const room = registry.get(signalId);
-    room.broadcast(this.socketId, data);
+    if (data.type === 'signal') {
+      const room = registry.get(signalId);
+      room.broadcast(this.socketId, data);
+      return;
+    }
+    throw new Error('unsupported type: ' + data.type);
   }
 
   private register(data: HandshakeData): void {
@@ -51,7 +55,8 @@ export class SocketContainer {
       throw new Error('signal already registered');
     }
     this.signalId = data.message;
-    this.registry.get(this.signalId).register(this.socketId, cbdata => this.socket.send(cbdata));
+    const room = this.registry.get(this.signalId);
+    room.register(this.socketId, cbdata => this.socket.send(JSON.stringify(cbdata)));
     this.processPending();
   }
   private processPending() {
