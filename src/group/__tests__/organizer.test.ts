@@ -1,7 +1,7 @@
 import { Organizer } from '../organizer';
+import { EmptyCallback } from './__mocks__/testHelpers';
 
 describe('organizer', () => {
-  const emptyCb = () => { };
   test('join() is idempotent', () => {
     const sut = new Organizer();
     expect(sut.health().length).toBe(0);
@@ -9,19 +9,19 @@ describe('organizer', () => {
     sut.join({
       signalId: 'a',
       clientId: 'c1',
-      cb: emptyCb,
+      cb: EmptyCallback,
     });
     expect(sut.health().length).toBe(1);
     sut.join({
       signalId: 'b',
       clientId: 'c2',
-      cb: emptyCb,
+      cb: EmptyCallback,
     });
     expect(sut.health().length).toBe(2);
     sut.join({
       signalId: 'a',
       clientId: 'c3',
-      cb: emptyCb,
+      cb: EmptyCallback,
     });
     expect(sut.health().length).toBe(2);
   });
@@ -32,12 +32,12 @@ describe('organizer', () => {
     const comm1 = sut.join({
       signalId: 'a',
       clientId: 'c1',
-      cb: emptyCb,
+      cb: EmptyCallback,
     });
     const comm2 = sut.join({
       signalId: 'a',
       clientId: 'c2',
-      cb: emptyCb,
+      cb: EmptyCallback,
     });
     expect(sut.health().length).toBe(1);
     expect(sut.health()[0].clients.length).toBe(2);

@@ -1,13 +1,6 @@
 import { Communicator } from "../communicator";
 import { Group } from "../group";
-
-class FakeGroup<T> {
-  readonly _broadcast: { clientId: string, message: T }[] = [];
-  _leaveCount = 0;
-  broadcast(clientId: string, msg: T) {
-    this._broadcast.push({ clientId, message: msg });
-  }
-}
+import { FakeGroup } from './__mocks__/testHelpers';
 
 describe('communicator', () => {
   test('broadcast', () => {

@@ -1,4 +1,4 @@
-import { TimeKeeper } from "../time";
+import { TimeKeeper } from "../../time";
 
 export class FakeTimeKeeper implements TimeKeeper {
   private state = 0;

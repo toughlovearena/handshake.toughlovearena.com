@@ -1,16 +1,25 @@
 import { Group } from "../group";
+import { EmptyCallback } from './__mocks__/testHelpers';
 
 describe('group', () => {
   test('register()', () => {
     const sut = new Group('signal');
     expect(sut.health().clients.length).toBe(0);
 
-    sut.register('a', () => { });
+    sut.register('a', EmptyCallback);
     expect(sut.health().clients.length).toBe(1);
 
-    sut.register('b', () => { });
+    sut.register('b', EmptyCallback);
     expect(sut.health().clients.length).toBe(2);
 
+    // idempotent
+    sut.register('b', EmptyCallback);
+    expect(sut.health().clients.length).toBe(2);
+
+    sut.unregister('a');
+    expect(sut.health().clients.length).toBe(1);
+
+    // idempotent
     sut.unregister('a');
     expect(sut.health().clients.length).toBe(1);
   });
