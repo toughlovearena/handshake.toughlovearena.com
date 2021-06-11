@@ -5,6 +5,7 @@ export class Communicator<T> {
   readonly clientId: string;
   private readonly group: Group<T>;
   private readonly onLeave: () => void;
+  private hasLeft = false;
   constructor(args: {
     clientId: string;
     group: Group<T>;
@@ -17,9 +18,11 @@ export class Communicator<T> {
   }
 
   broadcast(msg: T) {
+    if (this.hasLeft) { return; }
     return this.group.broadcast(this.clientId, msg);
   }
   leave() {
+    this.hasLeft = true;
     return this.onLeave();
   }
 }
