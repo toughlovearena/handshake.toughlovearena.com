@@ -1,18 +1,18 @@
 import * as WebSocket from 'ws';
-import { Registry } from "./registry";
+import { Organizer } from "./group/organizer";
 import { SocketContainer } from "./socket";
 import { HandshakeData } from './types';
 
 export class SocketManager {
   private clientTick = 0;
   private readonly sockets: Record<string, SocketContainer> = {};
-  constructor(private readonly registry: Registry<HandshakeData>) { }
+  constructor(private readonly organizer: Organizer<HandshakeData>) { }
 
   create(ws: WebSocket) {
     const socketContainer = new SocketContainer({
       clientId: (this.clientTick++).toString(),
       socket: ws,
-      registry: this.registry,
+      organizer: this.organizer,
       onCleanup: sc => this.onSocketCleanup(sc),
     });
     this.sockets[socketContainer.clientId] = socketContainer;

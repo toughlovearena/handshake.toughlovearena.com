@@ -1,6 +1,5 @@
 import * as WebSocket from 'ws';
-import { Communicator } from './communicator';
-import { Registry } from './registry';
+import { Communicator, Organizer } from './group';
 import { HandshakeData } from './types';
 
 export type CleanupSocket = (sc: SocketContainer) => void;
@@ -8,7 +7,7 @@ export type CleanupSocket = (sc: SocketContainer) => void;
 export class SocketContainer {
   readonly clientId: string;
   private readonly socket: WebSocket;
-  private readonly registry: Registry<HandshakeData>;
+  private readonly registry: Organizer<HandshakeData>;
   private readonly onCleanup: CleanupSocket;
 
   // stateful
@@ -18,12 +17,12 @@ export class SocketContainer {
   constructor(deps: {
     clientId: string;
     socket: WebSocket;
-    registry: Registry<HandshakeData>;
+    organizer: Organizer<HandshakeData>;
     onCleanup: CleanupSocket;
   }) {
     this.clientId = deps.clientId;
     this.socket = deps.socket;
-    this.registry = deps.registry;
+    this.registry = deps.organizer;
     this.onCleanup = deps.onCleanup;
 
     const { socket } = this;
@@ -51,7 +50,7 @@ export class SocketContainer {
 
   private cleanup() {
     if (this.comm) {
-      this.registry.leave(this.comm);
+      this.comm.leave();
     }
     this.socket.terminate();
     this.onCleanup(this);
@@ -61,8 +60,11 @@ export class SocketContainer {
       throw new Error('signal already registered');
     }
     const signalId = data.message;
-    this.comm = this.registry.getComm(signalId, this.clientId);
-    this.comm.register(cbdata => this.socket.send(JSON.stringify(cbdata)));
+    this.comm = this.registry.join({
+      signalId,
+      clientId: this.clientId,
+      cb: cbdata => this.socket.send(JSON.stringify(cbdata)),
+    });
     this.processPending();
   }
   private processPending() {
@@ -74,7 +76,7 @@ export class SocketContainer {
   health() {
     return {
       clientId: this.clientId,
-      room: this.comm?.signalId,
+      group: this.comm?.signalId,
       pending: this.pending,
     };
   }

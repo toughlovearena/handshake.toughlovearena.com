@@ -1,7 +1,7 @@
 import cors from 'cors';
 import WebSocketExpress, { Router } from 'websocket-express';
+import { Organizer } from './group';
 import { SocketManager } from './manager';
-import { Registry } from './registry';
 import { HandshakeData } from './types';
 
 export class Server {
@@ -10,8 +10,8 @@ export class Server {
   constructor(gitHash: string) {
     const router = new Router();
     const started = new Date();
-    const registry = new Registry<HandshakeData>();
-    const manager = new SocketManager(registry);
+    const organizer = new Organizer<HandshakeData>();
+    const manager = new SocketManager(organizer);
 
     router.get('/', (req, res) => {
       res.redirect('/health');
@@ -21,7 +21,7 @@ export class Server {
         gitHash,
         started,
         sockets: manager.health(),
-        registry: registry.health(),
+        organizer: organizer.health(),
       };
       res.send(data);
     });

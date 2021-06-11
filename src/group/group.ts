@@ -1,6 +1,6 @@
 export type SignalCallback<T> = (data: T) => void;
 
-export class Room<T> {
+export class Group<T> {
   readonly signalId: string;
   private readonly history: T[] = [];
   private readonly clients: Record<string, SignalCallback<T>> = {};

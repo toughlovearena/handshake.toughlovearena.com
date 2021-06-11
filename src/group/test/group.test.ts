@@ -1,8 +1,8 @@
-import { Room } from "../room";
+import { Group } from "../group";
 
-describe('room', () => {
+describe('group', () => {
   test('register()', () => {
-    const sut = new Room('signal');
+    const sut = new Group('signal');
     expect(sut.health().clients.length).toBe(0);
 
     sut.register('a', () => { });
@@ -16,7 +16,7 @@ describe('room', () => {
   });
 
   test('broadcast()', () => {
-    const sut = new Room<string>('signal');
+    const sut = new Group<string>('signal');
 
     const aInbox: string[] = [];
     sut.register('a', msg => aInbox.push(msg));
@@ -34,7 +34,7 @@ describe('room', () => {
   });
 
   test('cache old broadcasts', () => {
-    const sut = new Room<string>('signal');
+    const sut = new Group<string>('signal');
 
     const aInbox: string[] = [];
     sut.register('a', msg => aInbox.push(msg));
