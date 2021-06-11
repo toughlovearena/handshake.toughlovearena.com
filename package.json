@@ -8,7 +8,6 @@
     "node": ">=10.0.0"
   },
   "scripts": {
-    "ps": "netstat -lnp | grep 2500",
     "lint": "tslint -c tslint.json -p tsconfig.json --fix",
     "clean": "rimraf dist/*",
     "tsc": "tsc",
@@ -19,7 +18,6 @@
     "bg": "forever start dist/index.js",
     "kill": "forever stop dist/index.js",
     "update": "git checkout prod && git pull && npm i",
-    "rebuild": "npm-run-all update build kill bg",
     "setup": "npm-run-all update build bg",
     "test": "jest --detectOpenHandles",
     "ci-test": "jest --detectOpenHandles --runInBand"
