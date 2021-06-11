@@ -58,7 +58,7 @@ describe('socket', () => {
     expect(() => sendMessage(registerData)).toThrow();
   });
 
-  test('register allows receiving signals', () => {
+  test('register allows sending signals', () => {
     expect(getGroupSnapshot()).toBeUndefined();
     sendMessage(registerData);
     expect(getGroupSnapshot()).toBeTruthy();
@@ -78,5 +78,26 @@ describe('socket', () => {
     expect(getGroupSnapshot().history).toStrictEqual([signalData1, signalData2]);
     sendMessage(signalData3);
     expect(getGroupSnapshot().history).toStrictEqual([signalData1, signalData2, signalData3]);
+  });
+
+  test('register allows receiving signals', () => {
+    expect(getGroupSnapshot()).toBeUndefined();
+    sendMessage(registerData);
+
+    // setup second socket
+    const ws2 = new FakeSocket();
+    new SocketContainer({
+      clientId: 'c2',
+      socket: ws2._cast(),
+      organizer,
+      onCleanup: () => { },
+    });
+    ws2._trigger('message', JSON.stringify(registerData));
+    expect(ws._sent).toStrictEqual([]);
+
+    ws2._trigger('message', JSON.stringify(signalData1));
+    expect(ws._sent).toStrictEqual([JSON.stringify(signalData1)]);
+    ws2._trigger('message', JSON.stringify(signalData2));
+    expect(ws._sent).toStrictEqual([JSON.stringify(signalData1), JSON.stringify(signalData2)]);
   });
 });
