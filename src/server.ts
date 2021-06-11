@@ -20,7 +20,7 @@ export class Server {
       const data = {
         gitHash,
         started,
-        testVer: 0,
+        testVer: 1,
         sockets: manager.health(),
         organizer: organizer.health(),
       };
