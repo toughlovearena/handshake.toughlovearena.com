@@ -1,6 +1,6 @@
 import * as WebSocket from 'ws';
 
-type EventCallback = () => void
+type EventCallback = (data?: any) => void
 
 export class FakeSocket {
   _hooks: Record<string, EventCallback> = {};
@@ -13,10 +13,10 @@ export class FakeSocket {
     this._terminateCount++;
   }
 
-  _trigger(eventType: string) {
+  _trigger(eventType: string, data: string) {
     const cb = this._hooks[eventType];
     if (cb) {
-      cb();
+      cb(data);
     }
   }
   _cast() {

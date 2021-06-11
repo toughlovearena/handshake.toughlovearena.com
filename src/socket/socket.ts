@@ -31,7 +31,7 @@ export class SocketContainer {
     socket.on('close', () => this.cleanup());
   }
 
-  onMessage(msg: string) {
+  private onMessage(msg: string) {
     const data = JSON.parse(msg) as HandshakeData;
     if (data.type === 'register') {
       return this.register(data);

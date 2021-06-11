@@ -1,4 +1,4 @@
 export interface HandshakeData {
-  type: 'register' | 'ready' | 'signal' | 'error';
+  type: 'register' | 'signal' | 'error';
   message: string;
 }
