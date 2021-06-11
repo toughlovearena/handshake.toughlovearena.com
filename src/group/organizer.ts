@@ -15,19 +15,19 @@ export class Organizer<T> {
     return new Communicator({
       clientId: args.clientId,
       group,
-      onLeave: () => this.onCommLeave(args),
+      onLeave: () => this.onCommLeave({
+        clientId: args.clientId,
+        group,
+      }),
     });
   }
   private onCommLeave(args: {
-    signalId: string,
     clientId: string,
+    group: Group<T>,
   }) {
-    const group = this.lookup[args.signalId];
-    if (group) {
-      group.unregister(args.clientId);
-      if (group.isEmpty()) {
-        delete this.lookup[group.signalId];
-      }
+    args.group.unregister(args.clientId);
+    if (args.group.isEmpty()) {
+      delete this.lookup[args.group.signalId];
     }
   }
 
