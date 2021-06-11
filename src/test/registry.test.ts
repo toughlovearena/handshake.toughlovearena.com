@@ -1,34 +1,35 @@
 import { Registry } from '../registry';
 
 describe('registry', () => {
-  test('get() is idempotent', () => {
+  test('getComm() is idempotent', () => {
     const sut = new Registry();
     expect(sut.health().length).toBe(0);
 
-    sut.get('a');
+    sut.getComm('a', 'c1');
     expect(sut.health().length).toBe(1);
-    sut.get('b');
+    sut.getComm('b', 'c2');
     expect(sut.health().length).toBe(2);
-    sut.get('a');
+    sut.getComm('a', 'c3');
     expect(sut.health().length).toBe(2);
   });
 
   test('leave() removes empty rooms', () => {
     const sut = new Registry();
     expect(sut.health().length).toBe(0);
-    const room = sut.get('a');
+    const comm1 = sut.getComm('a', 'c1');
+    const comm2 = sut.getComm('a', 'c2');
     expect(sut.health().length).toBe(1);
 
-    room.register('c1', () => { });
-    room.register('c2', () => { });
-    expect(room.health().clients.length).toBe(2);
-
-    sut.leave(room, 'c1');
+    comm1.register(() => { });
+    comm2.register(() => { });
     expect(sut.health().length).toBe(1);
-    expect(room.health().clients.length).toBe(1);
+    expect(sut.health()[0].clients.length).toBe(2);
 
-    sut.leave(room, 'c2');
+    sut.leave(comm1);
+    expect(sut.health().length).toBe(1);
+    expect(sut.health()[0].clients.length).toBe(1);
+
+    sut.leave(comm2);
     expect(sut.health().length).toBe(0);
-    expect(room.health().clients.length).toBe(0);
   });
 });

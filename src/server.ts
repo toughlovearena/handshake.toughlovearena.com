@@ -2,6 +2,7 @@ import cors from 'cors';
 import WebSocketExpress, { Router } from 'websocket-express';
 import { SocketManager } from './manager';
 import { Registry } from './registry';
+import { HandshakeData } from './types';
 
 export class Server {
   private app = new WebSocketExpress();
@@ -9,7 +10,7 @@ export class Server {
   constructor(gitHash: string) {
     const router = new Router();
     const started = new Date();
-    const registry = new Registry();
+    const registry = new Registry<HandshakeData>();
     const manager = new SocketManager(registry);
 
     router.get('/', (req, res) => {

@@ -1,4 +1,4 @@
-type SignalCallback<T> = (data: T) => void;
+export type SignalCallback<T> = (data: T) => void;
 
 export class Room<T> {
   readonly signalId: string;

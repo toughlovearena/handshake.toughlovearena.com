@@ -1,28 +1,24 @@
 import * as WebSocket from 'ws';
+import { Communicator } from './communicator';
 import { Registry } from './registry';
-import { Room } from './room';
-
-interface HandshakeData {
-  type: 'register' | 'ready' | 'signal' | 'error';
-  message: string;
-}
+import { HandshakeData } from './types';
 
 export type CleanupSocket = (sc: SocketContainer) => void;
 
 export class SocketContainer {
   readonly clientId: string;
   private readonly socket: WebSocket;
-  private readonly registry: Registry;
+  private readonly registry: Registry<HandshakeData>;
   private readonly onCleanup: CleanupSocket;
 
   // stateful
-  private room: Room<HandshakeData>;
+  private comm: Communicator<HandshakeData>;
   private pending: string[] = [];
 
   constructor(deps: {
     clientId: string;
     socket: WebSocket;
-    registry: Registry;
+    registry: Registry<HandshakeData>;
     onCleanup: CleanupSocket;
   }) {
     this.clientId = deps.clientId;
@@ -41,32 +37,32 @@ export class SocketContainer {
     if (data.type === 'register') {
       return this.register(data);
     }
-    const { room } = this;
-    if (room === undefined) {
+    const { comm } = this;
+    if (comm === undefined) {
       this.pending.push(msg);
       return;
     }
     if (data.type === 'signal') {
-      room.broadcast(this.clientId, data);
+      comm.broadcast(data);
       return;
     }
     throw new Error('unsupported type: ' + data.type);
   }
 
   private cleanup() {
-    if (this.room) {
-      this.registry.leave(this.room, this.clientId);
+    if (this.comm) {
+      this.registry.leave(this.comm);
     }
     this.socket.terminate();
     this.onCleanup(this);
   }
   private register(data: HandshakeData): void {
-    if (this.room !== undefined) {
+    if (this.comm !== undefined) {
       throw new Error('signal already registered');
     }
     const signalId = data.message;
-    this.room = this.registry.get(signalId);
-    this.room.register(this.clientId, cbdata => this.socket.send(JSON.stringify(cbdata)));
+    this.comm = this.registry.getComm(signalId, this.clientId);
+    this.comm.register(cbdata => this.socket.send(JSON.stringify(cbdata)));
     this.processPending();
   }
   private processPending() {
@@ -78,7 +74,7 @@ export class SocketContainer {
   health() {
     return {
       clientId: this.clientId,
-      room: this.room?.signalId,
+      room: this.comm?.signalId,
       pending: this.pending,
     };
   }
