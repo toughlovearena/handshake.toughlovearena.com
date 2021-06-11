@@ -100,4 +100,28 @@ describe('socket', () => {
     ws2._trigger('message', JSON.stringify(signalData2));
     expect(ws._sent).toStrictEqual([JSON.stringify(signalData1), JSON.stringify(signalData2)]);
   });
+
+  test('close on error', () => {
+    sendMessage(registerData);
+    expect(ws._terminateCount).toBe(0);
+    expect(cleanupCount).toBe(0);
+    expect(getGroupSnapshot()).toBeTruthy();
+
+    ws._trigger('error');
+    expect(ws._terminateCount).toBe(1);
+    expect(cleanupCount).toBe(1);
+    expect(getGroupSnapshot()).toBeUndefined();
+  });
+
+  test('close on close', () => {
+    sendMessage(registerData);
+    expect(ws._terminateCount).toBe(0);
+    expect(cleanupCount).toBe(0);
+    expect(getGroupSnapshot()).toBeTruthy();
+
+    ws._trigger('close');
+    expect(ws._terminateCount).toBe(1);
+    expect(cleanupCount).toBe(1);
+    expect(getGroupSnapshot()).toBeUndefined();
+  });
 });
