@@ -1,14 +1,12 @@
 import * as WebSocket from 'ws';
 import { Registry } from "./registry";
 import { SocketContainer } from "./socket";
+import { HandshakeData } from './types';
 
 export class SocketManager {
   private clientTick = 0;
-  private readonly registry: Registry;
   private readonly sockets: Record<string, SocketContainer> = {};
-  constructor(registry: Registry) {
-    this.registry = registry;
-  }
+  constructor(private readonly registry: Registry<HandshakeData>) { }
 
   create(ws: WebSocket) {
     const socketContainer = new SocketContainer({
