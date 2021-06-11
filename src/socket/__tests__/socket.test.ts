@@ -12,6 +12,7 @@ describe('socket', () => {
   function sendMessage(msg: HandshakeData) {
     ws._trigger('message', JSON.stringify(msg));
   }
+  const clientId = 'c1';
   const groupId = 's1';
   const registerData: HandshakeData = {
     type: 'register',
@@ -38,7 +39,7 @@ describe('socket', () => {
     ws = new FakeSocket();
     cleanupCount = 0;
     sut = new SocketContainer({
-      clientId: 'c1',
+      clientId,
       socket: ws._cast(),
       organizer,
       onCleanup: () => cleanupCount++,
@@ -64,9 +65,14 @@ describe('socket', () => {
     expect(getGroupSnapshot()).toBeTruthy();
     expect(getGroupSnapshot().history).toStrictEqual([]);
     sendMessage(signalData1);
-    expect(getGroupSnapshot().history).toStrictEqual([signalData1]);
+    expect(getGroupSnapshot().history).toStrictEqual([
+      { clientId, message: signalData1, },
+    ]);
     sendMessage(signalData2);
-    expect(getGroupSnapshot().history).toStrictEqual([signalData1, signalData2]);
+    expect(getGroupSnapshot().history).toStrictEqual([
+      { clientId, message: signalData1, },
+      { clientId, message: signalData2, },
+    ]);
   });
 
   test('signals sent before register are queued up', () => {
@@ -75,9 +81,16 @@ describe('socket', () => {
     expect(getGroupSnapshot()).toBeUndefined();
     sendMessage(registerData);
     expect(getGroupSnapshot()).toBeTruthy();
-    expect(getGroupSnapshot().history).toStrictEqual([signalData1, signalData2]);
+    expect(getGroupSnapshot().history).toStrictEqual([
+      { clientId, message: signalData1, },
+      { clientId, message: signalData2, },
+    ]);
     sendMessage(signalData3);
-    expect(getGroupSnapshot().history).toStrictEqual([signalData1, signalData2, signalData3]);
+    expect(getGroupSnapshot().history).toStrictEqual([
+      { clientId, message: signalData1, },
+      { clientId, message: signalData2, },
+      { clientId, message: signalData3, },
+    ]);
   });
 
   test('register allows receiving signals', () => {

@@ -55,4 +55,25 @@ describe('group', () => {
     expect(aInbox).toStrictEqual([]);
     expect(bInbox).toStrictEqual(['a is lonely']);
   });
+
+  test('remove broadcast history on leave', () => {
+    const sut = new Group<string>('signal');
+
+    const aInbox: string[] = [];
+    sut.register('a', msg => aInbox.push(msg));
+    sut.broadcast('a', 'a was here');
+
+    const bInbox: string[] = [];
+    sut.register('b', msg => bInbox.push(msg));
+    sut.broadcast('b', 'b came second');
+
+    expect(sut.health().history).toStrictEqual([
+      { clientId: 'a', message: 'a was here', },
+      { clientId: 'b', message: 'b came second', },
+    ]);
+    sut.unregister('a');
+    expect(sut.health().history).toStrictEqual([
+      { clientId: 'b', message: 'b came second', },
+    ]);
+  });
 });
