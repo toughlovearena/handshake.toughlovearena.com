@@ -15,7 +15,7 @@
     "prestart": "npm-run-all lint build",
     "start": "node dist/index.js",
     "watch": "nodemon",
-    "bg": "forever start dist/index.js",
+    "bg": "npx @toughlovearena/updater",
     "kill": "forever stop dist/index.js",
     "update": "git checkout prod && git pull && npm i",
     "setup": "npm-run-all update build bg",
