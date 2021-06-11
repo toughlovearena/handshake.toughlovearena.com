@@ -17,13 +17,11 @@
     "watch": "nodemon",
     "bg": "npx @toughlovearena/updater",
     "kill": "forever stop dist/index.js",
-    "update": "git checkout prod && git pull && npm i",
-    "setup": "npm-run-all update build bg",
     "test": "jest --detectOpenHandles",
     "ci-test": "jest --detectOpenHandles --runInBand"
   },
   "dependencies": {
-    "@toughlovearena/updater": "^1.1.3",
+    "@toughlovearena/updater": "^2.0.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "simple-git": "^2.39.0",
