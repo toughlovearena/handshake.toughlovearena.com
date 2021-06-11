@@ -1,6 +1,6 @@
+import { Updater } from '@toughlovearena/updater';
 import simpleGit from 'simple-git';
 import { Server } from './server';
-import { Updater } from './updater';
 
 (async () => {
   const gitLog = await simpleGit().log();
