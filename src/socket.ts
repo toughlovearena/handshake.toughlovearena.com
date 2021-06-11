@@ -2,7 +2,7 @@ import * as WebSocket from 'ws';
 import { Registry } from './registry';
 import { Room } from './room';
 
-export interface HandshakeData {
+interface HandshakeData {
   type: 'register' | 'ready' | 'signal' | 'error';
   message: string;
 }
@@ -16,7 +16,7 @@ export class SocketContainer {
   private readonly onCleanup: CleanupSocket;
 
   // stateful
-  private room: Room;
+  private room: Room<HandshakeData>;
   private pending: string[] = [];
 
   constructor(deps: {

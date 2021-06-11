@@ -1,16 +1,14 @@
-import { HandshakeData } from "./socket";
+type SignalCallback<T> = (data: T) => void;
 
-type SignalCallback = (data: HandshakeData) => void;
-
-export class Room {
+export class Room<T> {
   readonly signalId: string;
-  private readonly history: HandshakeData[] = [];
-  private readonly clients: Record<string, SignalCallback> = {};
+  private readonly history: T[] = [];
+  private readonly clients: Record<string, SignalCallback<T>> = {};
   constructor(signalId: string) {
     this.signalId = signalId;
   }
 
-  register(clientId: string, cb: SignalCallback) {
+  register(clientId: string, cb: SignalCallback<T>) {
     this.clients[clientId] = cb;
     this.history.forEach(data => cb(data));
   }
@@ -21,7 +19,7 @@ export class Room {
     return Object.keys(this.clients).length === 0;
   }
 
-  broadcast(clientId: string, data: HandshakeData) {
+  broadcast(clientId: string, data: T) {
     this.history.push(data);
     Object.keys(this.clients).forEach(key => {
       if (key === clientId) { return; }
