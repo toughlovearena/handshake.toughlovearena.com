@@ -1,7 +1,7 @@
 import cors from 'cors';
 import WebSocketExpress, { Router } from 'websocket-express';
 import { Organizer } from './group';
-import { SocketManager } from './manager';
+import { SocketManager } from './socket';
 import { HandshakeData } from './types';
 
 export class Server {

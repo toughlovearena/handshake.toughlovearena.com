@@ -1,7 +1,7 @@
 import * as WebSocket from 'ws';
-import { Organizer } from "./group/organizer";
+import { Organizer } from "../group";
+import { HandshakeData } from '../types';
 import { SocketContainer } from "./socket";
-import { HandshakeData } from './types';
 
 export class SocketManager {
   private clientTick = 0;
@@ -17,7 +17,7 @@ export class SocketManager {
     });
     this.sockets[socketContainer.clientId] = socketContainer;
   }
-  onSocketCleanup(socket: SocketContainer) {
+  private onSocketCleanup(socket: SocketContainer) {
     delete this.sockets[socket.clientId];
   }
 

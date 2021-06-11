@@ -1,6 +1,6 @@
 import * as WebSocket from 'ws';
-import { Communicator, Organizer } from './group';
-import { HandshakeData } from './types';
+import { Communicator, Organizer } from '../group';
+import { HandshakeData } from '../types';
 
 export type CleanupSocket = (sc: SocketContainer) => void;
 
