@@ -1,4 +1,4 @@
-# presence server setup
+# server setup
 
 how to setup on unbuntu
 
@@ -45,8 +45,8 @@ nvm install 10.6
 
 ```bash
 
-git clone https://github.com/toughlovearena/cache.toughlovearena.com.git
-cd cache.toughlovearena.com
-npm run setup
+git clone https://github.com/toughlovearena/handshake.toughlovearena.com.git
+cd handshake.toughlovearena.com
+npm i
 
 ```
