@@ -7,9 +7,9 @@ import { FakeSocket } from './__mocks__/fakeSocket';
 describe('socket', () => {
   let organizer: Organizer<HandshakeData>;
   let ws: FakeSocket;
+  let timeKeeper: FakeTimeKeeper;
   let cleanupCount = 0;
   let sut: SocketContainer;
-  let timeKeeper: FakeTimeKeeper;
 
   function sendMessage(msg: HandshakeData) {
     ws._trigger('message', JSON.stringify(msg));
@@ -143,21 +143,21 @@ describe('socket', () => {
     expect(getGroupSnapshot()).toBeUndefined();
   });
 
-  test('checkAlive closes after TTL if no update', () => {
+  test('checkAlive() closes after TTL if no update', () => {
     timeKeeper._set(0);
     sut.checkAlive();
     expect(cleanupCount).toBe(0);
 
-    timeKeeper._set(sut.TTL);
+    timeKeeper._set(SocketContainer.TTL);
     sut.checkAlive();
     expect(cleanupCount).toBe(0);
 
-    timeKeeper._set(sut.TTL + 1);
+    timeKeeper._set(SocketContainer.TTL + 1);
     sut.checkAlive();
     expect(cleanupCount).toBe(1);
   });
 
-  test('checkAlive closes after TTL since last update', () => {
+  test('checkAlive() closes after TTL since last update', () => {
     timeKeeper._set(0);
     sut.checkAlive();
     expect(cleanupCount).toBe(0);
@@ -167,11 +167,11 @@ describe('socket', () => {
     sut.checkAlive();
     expect(cleanupCount).toBe(0);
 
-    timeKeeper._set(sut.TTL + 5);
+    timeKeeper._set(SocketContainer.TTL + 5);
     sut.checkAlive();
     expect(cleanupCount).toBe(0);
 
-    timeKeeper._set(sut.TTL + 6);
+    timeKeeper._set(SocketContainer.TTL + 6);
     sut.checkAlive();
     expect(cleanupCount).toBe(1);
   });

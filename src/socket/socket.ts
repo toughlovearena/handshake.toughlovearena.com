@@ -13,7 +13,7 @@ export class SocketContainer {
   private readonly createdAt: number;
   private updatedAt: number;
   private readonly onCleanup: CleanupSocket;
-  readonly TTL = 10 * 60 * 1000; // 10 minutes
+  static readonly TTL = 10 * 60 * 1000; // 10 minutes
 
   // stateful
   private comm: Communicator<HandshakeData>;
@@ -45,7 +45,7 @@ export class SocketContainer {
   checkAlive() {
     const now = this.timeKeeper.now();
     const diff = now - this.updatedAt;
-    if (diff > this.TTL) {
+    if (diff > SocketContainer.TTL) {
       this.cleanup();
     }
   }
