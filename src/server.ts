@@ -2,6 +2,7 @@ import cors from 'cors';
 import WebSocketExpress, { Router } from 'websocket-express';
 import { Organizer } from './group';
 import { SocketManager } from './socket';
+import { RealClock } from './time';
 import { HandshakeData } from './types';
 
 export class Server {
@@ -11,7 +12,7 @@ export class Server {
     const router = new Router();
     const started = new Date();
     const organizer = new Organizer<HandshakeData>();
-    const manager = new SocketManager(organizer);
+    const manager = new SocketManager(organizer, RealClock);
 
     router.get('/', (req, res) => {
       res.redirect('/health');
@@ -36,6 +37,10 @@ export class Server {
     this.app.use(cors());
     this.app.use(WebSocketExpress.json());
     this.app.use(router);
+
+    setInterval(() => {
+      manager.checkAlive();
+    });
   }
 
   listen(port: number) {

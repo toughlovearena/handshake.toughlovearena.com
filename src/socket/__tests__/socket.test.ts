@@ -1,5 +1,6 @@
 import { Organizer } from '../../group';
 import { HandshakeData } from '../../types';
+import { FakeTimeKeeper } from '../../__tests__/__mocks__/fakeTimeKeeper';
 import { SocketContainer } from '../socket';
 import { FakeSocket } from './__mocks__/fakeSocket';
 
@@ -8,6 +9,7 @@ describe('socket', () => {
   let ws: FakeSocket;
   let cleanupCount = 0;
   let sut: SocketContainer;
+  let timeKeeper: FakeTimeKeeper;
 
   function sendMessage(msg: HandshakeData) {
     ws._trigger('message', JSON.stringify(msg));
@@ -37,11 +39,13 @@ describe('socket', () => {
   beforeEach(() => {
     organizer = new Organizer<HandshakeData>();
     ws = new FakeSocket();
+    timeKeeper = new FakeTimeKeeper();
     cleanupCount = 0;
     sut = new SocketContainer({
       clientId,
       socket: ws._cast(),
       organizer,
+      timeKeeper,
       onCleanup: () => cleanupCount++,
     });
   });
@@ -103,6 +107,7 @@ describe('socket', () => {
       clientId: 'c2',
       socket: ws2._cast(),
       organizer,
+      timeKeeper,
       onCleanup: () => { },
     });
     ws2._trigger('message', JSON.stringify(registerData));
@@ -136,5 +141,38 @@ describe('socket', () => {
     expect(ws._terminateCount).toBe(1);
     expect(cleanupCount).toBe(1);
     expect(getGroupSnapshot()).toBeUndefined();
+  });
+
+  test('checkAlive closes after TTL if no update', () => {
+    timeKeeper._set(0);
+    sut.checkAlive();
+    expect(cleanupCount).toBe(0);
+
+    timeKeeper._set(sut.TTL);
+    sut.checkAlive();
+    expect(cleanupCount).toBe(0);
+
+    timeKeeper._set(sut.TTL + 1);
+    sut.checkAlive();
+    expect(cleanupCount).toBe(1);
+  });
+
+  test('checkAlive closes after TTL since last update', () => {
+    timeKeeper._set(0);
+    sut.checkAlive();
+    expect(cleanupCount).toBe(0);
+
+    timeKeeper._set(5);
+    sendMessage(registerData);
+    sut.checkAlive();
+    expect(cleanupCount).toBe(0);
+
+    timeKeeper._set(sut.TTL + 5);
+    sut.checkAlive();
+    expect(cleanupCount).toBe(0);
+
+    timeKeeper._set(sut.TTL + 6);
+    sut.checkAlive();
+    expect(cleanupCount).toBe(1);
   });
 });
