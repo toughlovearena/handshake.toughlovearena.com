@@ -102,6 +102,7 @@ export class SocketContainer {
       clientId: this.clientId,
       group: this.comm?.signalId,
       pending: this.pending,
+      ageInSeconds: Math.ceil((this.timeKeeper.now() - this.updatedAt) / 1000),
     };
   }
 }

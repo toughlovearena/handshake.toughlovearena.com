@@ -38,9 +38,11 @@ export class Server {
     this.app.use(WebSocketExpress.json());
     this.app.use(router);
 
+    // cron
+    const period = 30 * 1000; // 30 seconds
     setInterval(() => {
       manager.checkAlive();
-    });
+    }, period);
   }
 
   listen(port: number) {
