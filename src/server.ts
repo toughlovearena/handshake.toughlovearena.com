@@ -1,3 +1,4 @@
+import { Updater } from '@toughlovearena/updater';
 import cors from 'cors';
 import WebSocketExpress, { Router } from 'websocket-express';
 import { Organizer } from './group';
@@ -8,19 +9,19 @@ import { HandshakeData } from './types';
 export class Server {
   private app = new WebSocketExpress();
 
-  constructor(gitHash: string) {
+  constructor(updater: Updater) {
     const router = new Router();
-    const started = new Date();
     const organizer = new Organizer<HandshakeData>();
     const manager = new SocketManager(organizer, RealClock);
 
     router.get('/', (req, res) => {
       res.redirect('/health');
     });
-    router.get('/health', (req, res) => {
+    router.get('/health', async (req, res) => {
+      const gitHash = await updater.gitter.hash();
       const data = {
         gitHash,
-        started,
+        started: new Date(updater.startedAt),
         testVer: 3,
         sockets: manager.health(),
         organizer: organizer.health(),

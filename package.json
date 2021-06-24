@@ -21,10 +21,9 @@
     "ci-test": "jest --detectOpenHandles --runInBand"
   },
   "dependencies": {
-    "@toughlovearena/updater": "^2.0.0",
+    "@toughlovearena/updater": "^2.1.1",
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "simple-git": "^2.39.0",
     "websocket-express": "^1.4.0",
     "ws": "^7.4.6"
   },
