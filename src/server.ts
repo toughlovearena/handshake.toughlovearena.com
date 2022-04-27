@@ -11,7 +11,10 @@ export class Server {
 
   constructor(updater: Updater) {
     const router = new Router();
-    const manager = new SocketManager(() => new Organizer<HandshakeData>(), RealClock);
+    const manager = new SocketManager(
+      () => new Organizer<HandshakeData>(),
+      RealClock,
+    );
 
     router.get('/', (req, res) => {
       res.redirect('/health');
@@ -30,7 +33,7 @@ export class Server {
     // ws
     router.ws('/connect', async (req, res) => {
       const ws = await res.accept();
-      manager.create('legacy', ws);
+      manager.create('v0', ws);
     });
     router.ws('/:version/connect', async (req, res) => {
       const { version } = req.params;
