@@ -32,14 +32,14 @@ export class Server {
     });
 
     // ws
-    router.ws('/connect', async (req, res) => {
-      const ws = await res.accept();
-      manager.create('v0', ws);
-    });
-    router.ws('/:version/connect', async (req, res) => {
+    router.ws('/connect/:version', async (req, res) => {
       const { version } = req.params;
       const ws = await res.accept();
       manager.create(version, ws);
+    });
+    router.ws('/connect', async (req, res) => {
+      const ws = await res.accept();
+      manager.create('deprecated', ws);
     });
 
     this.app.use(cors());
