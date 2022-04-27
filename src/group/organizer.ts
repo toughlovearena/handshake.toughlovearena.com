@@ -3,6 +3,9 @@ import { Group, SignalCallback } from "./group";
 
 export class Organizer<T> {
   private readonly lookup: Record<string, Group<T>> = {};
+  constructor(
+    readonly version: string,
+  ) { }
 
   join(args: {
     signalId: string,
@@ -35,7 +38,10 @@ export class Organizer<T> {
     return Object.keys(this.lookup).length === 0;
   }
 
-  health() {
-    return Object.values(this.lookup).map(group => group.health());
+  health(verbose?: boolean) {
+    return {
+      version: this.version,
+      groups: Object.values(this.lookup).map(group => group.health(verbose)),
+    };
   }
 }

@@ -9,17 +9,17 @@ export class SocketManager {
   private clientTick = 0;
   private readonly sockets: Record<string, SocketContainer> = {};
   constructor(
-    private readonly organizerFactory: () => Organizer<HandshakeData>,
+    private readonly organizerFactory: (version: string) => Organizer<HandshakeData>,
     private readonly timeKeeper: TimeKeeper,
   ) { }
 
-  private readonly organizers = new DefaultMap<string, Organizer<HandshakeData>>(this.organizerFactory);
+  private readonly organizers = new DefaultMap<string, Organizer<HandshakeData>>();
 
-  create(key: string, ws: WebSocket) {
+  create(version: string, ws: WebSocket) {
     const socketContainer = new SocketContainer({
       clientId: (this.clientTick++).toString(),
       socket: ws,
-      organizer: this.organizers.get(key),
+      organizer: this.organizers.get(version, () => this.organizerFactory(version)),
       timeKeeper: this.timeKeeper,
       onCleanup: sc => this.onSocketCleanup(sc),
     });
@@ -32,24 +32,18 @@ export class SocketManager {
   checkAlive() {
     Object.values(this.sockets).forEach(socket => socket.checkAlive());
     Array.from(this.organizers.entries()).forEach(entry => {
-      const [key, org] = entry;
+      const [version, org] = entry;
       if (org.isEmpty()) {
-        this.organizers.remove(key);
+        this.organizers.remove(version);
       }
     });
   }
 
-  health() {
+  health(verbose?: boolean) {
     return {
       tick: this.clientTick,
-      clients: Object.values(this.sockets).map(s => s.health()),
-      organizers: Array.from(this.organizers.entries()).map(entry => {
-        const [key, org] = entry;
-        return {
-          ...org,
-          key,
-        };
-      }),
+      clients: Object.values(this.sockets).map(s => s.health(verbose)),
+      organizers: Array.from(this.organizers.entries()).map(entry => entry[1].health(verbose)),
     };
   }
 }

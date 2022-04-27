@@ -12,7 +12,7 @@ export class Server {
   constructor(updater: Updater) {
     const router = new Router();
     const manager = new SocketManager(
-      () => new Organizer<HandshakeData>(),
+      version => new Organizer<HandshakeData>(version),
       RealClock,
     );
 
@@ -20,12 +20,13 @@ export class Server {
       res.redirect('/health');
     });
     router.get('/health', async (req, res) => {
+      const { verbose } = req.query;
       const gitHash = await updater.gitter.hash();
       const data = {
         gitHash,
         started: new Date(updater.startedAt),
         testVer: 3,
-        manager: manager.health(),
+        manager: manager.health(!!verbose),
       };
       res.send(data);
     });
