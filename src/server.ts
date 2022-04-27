@@ -37,10 +37,6 @@ export class Server {
       const ws = await res.accept();
       manager.create(version, ws);
     });
-    router.ws('/connect', async (req, res) => {
-      const ws = await res.accept();
-      manager.create('deprecated', ws);
-    });
 
     this.app.use(cors());
     this.app.use(WebSocketExpress.json());
