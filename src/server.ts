@@ -11,28 +11,35 @@ export class Server {
 
   constructor(updater: Updater) {
     const router = new Router();
-    const organizer = new Organizer<HandshakeData>();
-    const manager = new SocketManager(organizer, RealClock);
+    const manager = new SocketManager(
+      version => new Organizer<HandshakeData>(version),
+      RealClock,
+    );
 
     router.get('/', (req, res) => {
       res.redirect('/health');
     });
     router.get('/health', async (req, res) => {
+      const { verbose } = req.query;
       const gitHash = await updater.gitter.hash();
       const data = {
         gitHash,
         started: new Date(updater.startedAt),
         testVer: 3,
-        sockets: manager.health(),
-        organizer: organizer.health(),
+        manager: manager.health(!!verbose),
       };
       res.send(data);
     });
 
     // ws
+    router.ws('/connect/:version', async (req, res) => {
+      const { version } = req.params;
+      const ws = await res.accept();
+      manager.create(version, ws);
+    });
     router.ws('/connect', async (req, res) => {
       const ws = await res.accept();
-      manager.create(ws);
+      manager.create('deprecated', ws);
     });
 
     this.app.use(cors());

@@ -34,11 +34,11 @@ export class Group<T> {
     });
   }
 
-  health() {
+  health(verbose?: boolean) {
     return {
       signalId: this.signalId,
-      history: this.history,
       clients: Object.keys(this.clients),
+      history: verbose ? this.history : this.history.length,
     };
   }
 }

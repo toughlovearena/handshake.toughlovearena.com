@@ -97,12 +97,13 @@ export class SocketContainer {
     toProcess.forEach(pendingMsg => this.receive(pendingMsg));
   }
 
-  health() {
+  health(verbose?: boolean) {
     return {
       clientId: this.clientId,
+      version: this.registry.version,
       group: this.comm?.signalId,
-      pending: this.pending,
       ageInSeconds: Math.ceil((this.timeKeeper.now() - this.updatedAt) / 1000),
+      pending: verbose ? this.pending : this.pending.length,
     };
   }
 }

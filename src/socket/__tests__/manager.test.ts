@@ -6,21 +6,22 @@ import { SocketContainer } from '../socket';
 import { FakeSocket } from './__mocks__/fakeSocket';
 
 describe('socketManager', () => {
+  const version = 'vtest';
   let organizer: Organizer<HandshakeData>;
   let timeKeeper: FakeTimeKeeper;
   let sut: SocketManager;
 
   beforeEach(() => {
-    organizer = new Organizer<HandshakeData>();
+    organizer = new Organizer<HandshakeData>(version);
     timeKeeper = new FakeTimeKeeper();
-    sut = new SocketManager(organizer, timeKeeper);
+    sut = new SocketManager(() => organizer, timeKeeper);
   });
 
   test('create()', () => {
     expect(sut.health().clients.length).toBe(0);
 
     const ws = new FakeSocket();
-    sut.create(ws._cast());
+    sut.create(version, ws._cast());
     expect(sut.health().clients.length).toBe(1);
 
     ws._trigger('close');
@@ -31,7 +32,7 @@ describe('socketManager', () => {
     expect(sut.health().clients.length).toBe(0);
 
     const ws = new FakeSocket();
-    sut.create(ws._cast());
+    sut.create(version, ws._cast());
     sut.checkAlive();
     expect(sut.health().clients.length).toBe(1);
 
