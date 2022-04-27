@@ -27,16 +27,16 @@ export class SocketManager {
   }
   private onSocketCleanup(socket: SocketContainer) {
     delete this.sockets[socket.clientId];
-  }
-
-  checkAlive() {
-    Object.values(this.sockets).forEach(socket => socket.checkAlive());
     Array.from(this.organizers.entries()).forEach(entry => {
       const [version, org] = entry;
       if (org.isEmpty()) {
         this.organizers.remove(version);
       }
     });
+  }
+
+  checkAlive() {
+    Object.values(this.sockets).forEach(socket => socket.checkAlive());
   }
 
   health(verbose?: boolean) {
