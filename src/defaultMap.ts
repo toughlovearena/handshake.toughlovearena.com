@@ -15,7 +15,9 @@ export class DefaultMap<K, V> {
   public remove(key: K): boolean {
     return this.map.delete(key);
   }
-
+  public values() {
+    return this.map.values();
+  }
   public entries() {
     return this.map.entries();
   }

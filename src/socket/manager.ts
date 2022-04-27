@@ -8,12 +8,12 @@ import { SocketContainer } from "./socket";
 export class SocketManager {
   private clientTick = 0;
   private readonly sockets: Record<string, SocketContainer> = {};
+  private readonly organizers = new DefaultMap<string, Organizer<HandshakeData>>();
   constructor(
     private readonly organizerFactory: (version: string) => Organizer<HandshakeData>,
     private readonly timeKeeper: TimeKeeper,
   ) { }
 
-  private readonly organizers = new DefaultMap<string, Organizer<HandshakeData>>();
 
   create(version: string, ws: WebSocket) {
     const socketContainer = new SocketContainer({
@@ -43,7 +43,7 @@ export class SocketManager {
     return {
       tick: this.clientTick,
       clients: Object.values(this.sockets).map(s => s.health(verbose)),
-      organizers: Array.from(this.organizers.entries()).map(entry => entry[1].health(verbose)),
+      organizers: Array.from(this.organizers.values()).map(org => org.health(verbose)),
     };
   }
 }
