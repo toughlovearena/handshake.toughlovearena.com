@@ -11,8 +11,7 @@ export class Server {
 
   constructor(updater: Updater) {
     const router = new Router();
-    const organizer = new Organizer<HandshakeData>();
-    const manager = new SocketManager(organizer, RealClock);
+    const manager = new SocketManager(() => new Organizer<HandshakeData>(), RealClock);
 
     router.get('/', (req, res) => {
       res.redirect('/health');
@@ -23,8 +22,7 @@ export class Server {
         gitHash,
         started: new Date(updater.startedAt),
         testVer: 3,
-        sockets: manager.health(),
-        organizer: organizer.health(),
+        manager: manager.health(),
       };
       res.send(data);
     });
@@ -32,7 +30,12 @@ export class Server {
     // ws
     router.ws('/connect', async (req, res) => {
       const ws = await res.accept();
-      manager.create(ws);
+      manager.create('legacy', ws);
+    });
+    router.ws('/:version/connect', async (req, res) => {
+      const { version } = req.params;
+      const ws = await res.accept();
+      manager.create(version, ws);
     });
 
     this.app.use(cors());

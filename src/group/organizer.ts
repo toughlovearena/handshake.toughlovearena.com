@@ -31,6 +31,10 @@ export class Organizer<T> {
     }
   }
 
+  isEmpty() {
+    return Object.keys(this.lookup).length === 0;
+  }
+
   health() {
     return Object.values(this.lookup).map(group => group.health());
   }
