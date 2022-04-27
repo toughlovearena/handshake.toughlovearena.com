@@ -5,6 +5,7 @@ import { SocketContainer } from '../socket';
 import { FakeSocket } from './__mocks__/fakeSocket';
 
 describe('socket', () => {
+  const version = 'vtest';
   let organizer: Organizer<HandshakeData>;
   let ws: FakeSocket;
   let timeKeeper: FakeTimeKeeper;
@@ -33,11 +34,11 @@ describe('socket', () => {
     message: 'data3',
   };
   function getGroupSnapshot() {
-    return organizer.health().filter(g => g.signalId === groupId)[0];
+    return organizer.health(true).groups.filter(g => g.signalId === groupId)[0];
   }
 
   beforeEach(() => {
-    organizer = new Organizer<HandshakeData>();
+    organizer = new Organizer<HandshakeData>(version);
     ws = new FakeSocket();
     timeKeeper = new FakeTimeKeeper();
     cleanupCount = 0;

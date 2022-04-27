@@ -67,12 +67,12 @@ describe('group', () => {
     sut.register('b', msg => bInbox.push(msg));
     sut.broadcast('b', 'b came second');
 
-    expect(sut.health().history).toStrictEqual([
+    expect(sut.health(true).history).toStrictEqual([
       { clientId: 'a', message: 'a was here', },
       { clientId: 'b', message: 'b came second', },
     ]);
     sut.unregister('a');
-    expect(sut.health().history).toStrictEqual([
+    expect(sut.health(true).history).toStrictEqual([
       { clientId: 'b', message: 'b came second', },
     ]);
   });
