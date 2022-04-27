@@ -13,14 +13,14 @@ describe('socketManager', () => {
   beforeEach(() => {
     organizer = new Organizer<HandshakeData>();
     timeKeeper = new FakeTimeKeeper();
-    sut = new SocketManager(organizer, timeKeeper);
+    sut = new SocketManager(() => organizer, timeKeeper);
   });
 
   test('create()', () => {
     expect(sut.health().clients.length).toBe(0);
 
     const ws = new FakeSocket();
-    sut.create(ws._cast());
+    sut.create('key', ws._cast());
     expect(sut.health().clients.length).toBe(1);
 
     ws._trigger('close');
@@ -31,7 +31,7 @@ describe('socketManager', () => {
     expect(sut.health().clients.length).toBe(0);
 
     const ws = new FakeSocket();
-    sut.create(ws._cast());
+    sut.create('key', ws._cast());
     sut.checkAlive();
     expect(sut.health().clients.length).toBe(1);
 
